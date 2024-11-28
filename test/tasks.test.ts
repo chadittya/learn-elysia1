@@ -1,5 +1,6 @@
-import { describe, expect, it } from "bun:test";
+import { beforeEach, describe, expect, it } from "bun:test";
 import app from "../src";
+import { TaskUtils } from "./tasks-utils";
 
 describe("POST /tasks", () => {
   it("should create new task", async () => {
@@ -94,18 +95,39 @@ describe("POST /tasks", () => {
 });
 
 describe("GET /tasks", () => {
+  beforeEach(() => {
+    TaskUtils.reset();
+  });
   it("should return an empty array when no tasks exist", async () => {
     const response = await app.handle(
       new Request("http://localhost:3000/tasks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: "",
-          description: "",
-        }),
+        method: "GET",
       })
     );
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    // console.log(response);
+    // console.log(body);
+
+    expect(body.data).toEqual([]);
+  });
+
+  it("should be return all tasks", async () => {
+    TaskUtils.create();
+    TaskUtils.createSecond();
+
+    const response = await app.handle(
+      new Request("http://localhost:3000/tasks", {
+        method: "GET",
+      })
+    );
+
+    expect(response.status).toBe(200);
+
+    const body = await response.json();
+    expect(body.data).toBeDefined();
+    expect(body.data).toBeArray();
+    expect(body.data.length).toBeGreaterThanOrEqual(1);
   });
 });

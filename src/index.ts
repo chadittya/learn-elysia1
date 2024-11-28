@@ -9,6 +9,7 @@ const app = new Elysia()
     ({ body }) => TaskServises.create(body as taskRequest),
     TaskSchema.create
   )
+  .get("/tasks", () => TaskServises.getAll())
   .listen(3000);
 
 console.log(
