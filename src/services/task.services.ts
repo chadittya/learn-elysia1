@@ -26,4 +26,39 @@ export class TaskServises {
       data: [...this.tasks],
     };
   }
+
+  static getTaskById(id: number): { data: taskResponse | undefined } {
+    const task = this.tasks.find((task) => task.id === id);
+    if (!task) {
+      throw new Response(
+        JSON.stringify({
+          error: "Task not found",
+        }),
+        { status: 404 }
+      );
+    }
+    return { data: task };
+  }
+
+  static update(
+    id: number,
+    request: Partial<taskResponse>
+  ): { data: taskResponse | null } {
+    const taskIndex = this.tasks.findIndex((task) => task.id === id);
+
+    if (taskIndex === -1) {
+      throw new Response(
+        JSON.stringify({
+          error: "Task not found",
+        }),
+        { status: 404 }
+      );
+    }
+
+    if (request.hasOwnProperty("complete")) {
+      this.tasks[taskIndex].complete = request.complete!;
+    }
+
+    return { data: this.tasks[taskIndex] };
+  }
 }

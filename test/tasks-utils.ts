@@ -1,11 +1,14 @@
+import { taskResponse } from "../src/models/task.model";
 import { TaskServises } from "../src/services/task.services";
 
 export class TaskUtils {
-  static create() {
+  static create(): taskResponse[] {
     const task1 = TaskServises.create({
       title: "First Task",
       description: "First Description",
     });
+
+    return [task1];
   }
   static createSecond() {
     const task1 = TaskServises.create({

@@ -13,4 +13,14 @@ export class TaskSchema {
       }),
     }),
   };
+
+  static update = {
+    body: t.Object({
+      complete: t.Boolean({
+        error: {
+          error: "Varibale cannot be update except complete field",
+        },
+      }),
+    }),
+  };
 }

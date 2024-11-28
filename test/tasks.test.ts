@@ -131,3 +131,122 @@ describe("GET /tasks", () => {
     expect(body.data.length).toBeGreaterThanOrEqual(1);
   });
 });
+
+describe("GET /tasks/:id", () => {
+  beforeEach(() => {
+    TaskUtils.reset();
+  });
+  it("should get single task by id", async () => {
+    const tasks = TaskUtils.create();
+    const getTask = tasks[0];
+
+    const response = await app.handle(
+      new Request(`http://localhost:3000/tasks/${getTask?.id}`, {
+        method: "GET",
+      })
+    );
+
+    expect(response.status).toBe(200);
+
+    const body = await response.json();
+    // console.log(response);
+    // console.log(body);
+    expect(body.data).toBeDefined();
+    expect(body.data.id).toBeDefined();
+    expect(body.data.title).toBeDefined();
+    expect(body.data.description).toBeDefined();
+    expect(body.data.complete).toBeDefined();
+  });
+
+  it("should not get task if id not available", async () => {
+    const tasks = TaskUtils.create();
+    const getTask = tasks[0];
+
+    const response = await app.handle(
+      new Request(`http://localhost:3000/tasks/1234`, {
+        method: "GET",
+      })
+    );
+
+    expect(response.status).toBe(404);
+
+    const body = await response.json();
+    // console.log(response);
+    // console.log(body);
+    expect(body.error).toBeDefined();
+  });
+});
+
+describe("PUT /tasks/:id", () => {
+  beforeEach(() => {
+    TaskUtils.reset();
+  });
+  it("should be update complete", async () => {
+    const tasks = TaskUtils.create();
+    const getTask = tasks[0];
+
+    const response = await app.handle(
+      new Request(`http://localhost:3000/tasks/${getTask.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          complete: true,
+        }),
+      })
+    );
+
+    expect(response.status).toBe(200);
+
+    const body1 = await response.json();
+    // console.log(response);
+    // console.log(body1);
+    expect(body1.data).toBeDefined();
+    expect(body1.data.complete).toBe(true);
+
+    const response2 = await app.handle(
+      new Request(`http://localhost:3000/tasks/${getTask.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          complete: false,
+        }),
+      })
+    );
+
+    expect(response2.status).toBe(200);
+
+    const body2 = await response2.json();
+    // console.log(response2);
+    // console.log(body2);
+    expect(body2.data).toBeDefined();
+    expect(body2.data.complete).toBe(false);
+  });
+
+  it("should not update other than complete field (update title)", async () => {
+    const tasks = TaskUtils.create();
+    const getTask = tasks[0];
+
+    const response = await app.handle(
+      new Request(`http://localhost:3000/tasks/${getTask.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: "updated",
+        }),
+      })
+    );
+
+    expect(response.status).toBe(422);
+
+    const body = await response.json();
+    // console.log(response);
+    // console.log(body);
+    expect(body.error).toBeDefined();
+  });
+});
