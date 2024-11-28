@@ -250,3 +250,43 @@ describe("PUT /tasks/:id", () => {
     expect(body.error).toBeDefined();
   });
 });
+
+describe("DELETE /tasks/:id", () => {
+  beforeEach(() => {
+    TaskUtils.reset();
+  });
+
+  it("should be delete tasks", async () => {
+    const tasks = TaskUtils.create();
+    const getTask = tasks[0];
+
+    const response = await app.handle(
+      new Request(`http://localhost:3000/tasks/${getTask.id}`, {
+        method: "DELETE",
+      })
+    );
+
+    expect(response.status).toBe(200);
+    const body = await response.json();
+    // console.log(response);
+    // console.log(body);
+    expect(body.deleted).toBeDefined();
+  });
+
+  it("should be delete tasks if id not available", async () => {
+    const tasks = TaskUtils.create();
+    const getTask = tasks[0];
+
+    const response = await app.handle(
+      new Request(`http://localhost:3000/tasks/99999`, {
+        method: "DELETE",
+      })
+    );
+
+    expect(response.status).toBe(404);
+    const body = await response.json();
+    // console.log(response);
+    // console.log(body);
+    expect(body.error).toBeDefined();
+  });
+});

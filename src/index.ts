@@ -19,6 +19,7 @@ const app = new Elysia()
       TaskServises.update(Number(params.id), body as taskResponse),
     TaskSchema.update
   )
+  .delete("/tasks/:id", ({ params }) => TaskServises.delete(Number(params.id)))
   .listen(3000);
 
 console.log(

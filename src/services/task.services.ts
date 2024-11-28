@@ -3,7 +3,6 @@ import {
   taskResponse,
   toTaskResponse,
 } from "../models/task.model";
-import { TaskSchema } from "../schema/task.schema";
 
 export class TaskServises {
   private static tasks: taskResponse[] = [];
@@ -37,7 +36,7 @@ export class TaskServises {
         { status: 404 }
       );
     }
-    return { data: task };
+    return { data: toTaskResponse(task) };
   }
 
   static update(
@@ -59,6 +58,26 @@ export class TaskServises {
       this.tasks[taskIndex].complete = request.complete!;
     }
 
-    return { data: this.tasks[taskIndex] };
+    return { data: toTaskResponse(this.tasks[taskIndex]) };
+  }
+
+  static delete(id: number): { deleted: boolean } {
+    const taskIndex = this.tasks.findIndex((task) => task.id === id);
+
+    // Check if the task exists
+    if (taskIndex === -1) {
+      throw new Response(
+        JSON.stringify({
+          error: "Task not found",
+        }),
+        { status: 404 }
+      );
+    }
+
+    // Remove the task from the array
+    this.tasks.splice(taskIndex, 1);
+
+    // Return the success response
+    return { deleted: true };
   }
 }
